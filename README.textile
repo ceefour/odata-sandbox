@@ -14,7 +14,7 @@ $ curl -H 'Accept: application/json' 'http://localhost:8887/OdataProduct.svc/Thr
 
 h2. Get a single entity
 
-bc..
+bc.. 
 $ curl --get -H 'Accept: application/json' 'http://ocalhost:8887/OdataProduct.svc/Threads(12L)' | jsonpretty
 
 h2. Filter results by property ($filter)
