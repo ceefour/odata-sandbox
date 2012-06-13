@@ -1,5 +1,14 @@
 OData 3.0 specification: http://www.odata.org/media/30002/OData.html
 
+h2. How to Run
+
+bc. mvn exec:java
+
+It will start an embedded Jersey server.
+
+WADL will be available at: http://localhost:8887/OdataProduct.svc/application.wadl
+
+
 h2. Get the threads
 
 bc.. 
