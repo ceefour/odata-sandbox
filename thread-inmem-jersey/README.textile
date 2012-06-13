@@ -172,6 +172,27 @@ $ curl -H 'Accept: application/json' 'http://localhost:8887/OdataProduct.svc/Thr
       },
 ...
 
+h2. Get a single entity
+
+bc.. 
+$ curl --get -H 'Accept: application/json' 'http://ocalhost:8887/OdataProduct.svc/Threads(12L)' | jsonpretty
+
+{
+  "d": {
+    "__metadata": {
+      "uri": "http://localhost:8887/OdataProduct.svc/Threads(12L)",
+      "type": "OdataProduct.Threads"
+    },
+    "Name": "DestroyJavaVM",
+    "State": "RUNNABLE",
+    "Daemon": false,
+    "Id": "12",
+    "Alive": true,
+    "Interrupted": false,
+    "Priority": 5
+  }
+}
+
 h2. Filter results by property ($filter)
 
 bc.. 

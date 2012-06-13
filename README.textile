@@ -12,6 +12,11 @@ h2. We love JSON :-) JavaScript code in browser does too!
 bc.. 
 $ curl -H 'Accept: application/json' 'http://localhost:8887/OdataProduct.svc/Threads' | jsonpretty
 
+h2. Get a single entity
+
+bc..
+$ curl --get -H 'Accept: application/json' 'http://ocalhost:8887/OdataProduct.svc/Threads(12L)' | jsonpretty
+
 h2. Filter results by property ($filter)
 
 bc.. 
