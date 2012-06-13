@@ -1,8 +1,7 @@
-package org.soluvas.odataproduct;
+package com.hendyirawan.odatasandbox.threadinmemjersey;
 
 import java.util.Arrays;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 
 import org.core4j.Func;
@@ -20,15 +19,15 @@ import com.sun.jersey.api.container.filter.LoggingFilter;
 /**
  * @author ceefour
  */
-public class OdataProduct {
+public class ThreadInmemJersey {
 
-	private transient Logger log = LoggerFactory.getLogger(OdataProduct.class);
+	private transient Logger log = LoggerFactory.getLogger(ThreadInmemJersey.class);
 	private InMemoryProducer producer;
 	
 	public void start(@Observes ContainerInitialized e) {
-		log.info("Starting OdataProduct");
+		log.info("Starting ThreadInmemJersey");
 		// Create producer
-		producer = new InMemoryProducer("OdataProduct", null, 100, null, null);
+		producer = new InMemoryProducer("ThreadInmemJersey", null, 100, null, null);
 		// Register entity set
 		producer.register(Thread.class, "Threads", new Func<Iterable<Thread>>() {
 			@Override
@@ -48,7 +47,7 @@ public class OdataProduct {
 	}
 	
 	public void startJerseyServer() {
-		JerseyServer server = new JerseyServer("http://localhost:8887/OdataProduct.svc/", DefaultODataApplication.class, RootApplication.class)
+		JerseyServer server = new JerseyServer("http://localhost:8887/ThreadInmemJersey.svc/", DefaultODataApplication.class, RootApplication.class)
 			.addJerseyRequestFilter(LoggingFilter.class);
 		server.start();
 	}
