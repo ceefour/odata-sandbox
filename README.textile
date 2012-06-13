@@ -1,0 +1,413 @@
+OData 3.0 specification: http://www.odata.org/media/30002/OData.html
+
+h1. OData Crash Course
+
+h2. Get the threads
+
+bc.. 
+$ curl 'http://localhost:8887/OdataProduct.svc/Threads' | xmllint --format -
+
+h2. We love JSON :-) JavaScript code in browser does too!
+
+bc.. 
+$ curl -H 'Accept: application/json' 'http://localhost:8887/OdataProduct.svc/Threads' | jsonpretty
+
+h2. Filter results by property ($filter)
+
+bc.. 
+$ curl -v --get --data-urlencode "\$filter=State eq 'RUNNABLE'" 
+
+h2. Sort by specific property ($orderby)
+
+bc.. 
+curl --get --data-urlencode "\$filter=State eq 'RUNNABLE'" --data-urlencode '$orderby=Id desc' 'http://localhost:8887/OdataProduct.svc/Threads' | xmllint --format -
+
+h2. Select only specific fields ($select)
+
+bc.. 
+curl -v --get --data-urlencode '$select=Id' --data-urlencode '$format=json' 'http://localhost:8887/OdataProduct.svc/Threads' | jsonpretty
+
+p. Note: Doesn't seem to work on odata4j 0.6.0 with InMemoryProducer :-(
+
+h2. Limit number of returned data ($top, $skip)
+
+bc.. 
+curl -v --get --data-urlencode '$top=2' --data-urlencode '$format=json' 'http://localhost:8887/OdataProduct.svc/Threads' | jsonpretty
+
+h2. Inline Count ($inlinecount)
+
+bc.. 
+$ curl --get -H 'Accept: application/json' --data-urlencode '$top=2' --data-urlencode '$inlinecount=allpages' 'http://localhost:8887/OdataProduct.svc/Threads' | jsonpretty
+
+h2. Get count of entities
+
+bc. $ curl --get 'http://localhost:8887/OdataProduct.svc/Threads/$count'
+8
+
+h2. Get count of entities matching filter
+
+bc. $ curl --get --data-urlencode "\$filter=State eq 'RUNNABLE'" 'http://localhost:8887/OdataProduct.svc/Threads/$count'
+4
+
+h2. Get WADL
+
+bc.. 
+$ curl 'http://localhost:8887/OdataProduct.svc/application.wadl' | xmllint --format -
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<application xmlns="http://research.sun.com/wadl/2006/10">
+  <doc xmlns:jersey="http://jersey.dev.java.net/" jersey:generatedBy="Jersey: 1.1.5 01/20/2010 03:55 PM"/>
+  <resources base="http://localhost:8887/OdataProduct.svc/">
+    <resource path="{entitySetName}{id: \(.+?\)}">
+      <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="id"/>
+      <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+      <method name="GET" id="getEntity">
+        <request>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+        </request>
+        <response>
+          <representation mediaType="application/atom+xml;charset=utf-8"/>
+          <representation mediaType="text/javascript;charset=utf-8"/>
+          <representation mediaType="application/json;charset=utf-8"/>
+        </response>
+      </method>
+      <method name="DELETE" id="deleteEntity">
+        <response>
+          <representation mediaType="*/*"/>
+        </response>
+      </method>
+      <method name="POST" id="mergeEntity">
+        <request>
+          <representation mediaType="*/*"/>
+        </request>
+        <response>
+          <representation mediaType="*/*"/>
+        </response>
+      </method>
+      <method name="PUT" id="updateEntity">
+        <request>
+          <representation mediaType="*/*"/>
+        </request>
+        <response>
+          <representation mediaType="*/*"/>
+        </response>
+      </method>
+      <resource path="{navProp: .+}">
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="id"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="navProp"/>
+        <method name="GET" id="getNavProperty">
+          <request>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$inlinecount"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$top"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skip"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$filter"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$orderby"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skiptoken"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+          </request>
+          <response>
+            <representation mediaType="application/atom+xml;charset=utf-8"/>
+            <representation mediaType="text/javascript;charset=utf-8"/>
+            <representation mediaType="application/json;charset=utf-8"/>
+          </response>
+        </method>
+        <method name="DELETE" id="deleteEntity">
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+        <method name="POST" id="mergeEntity">
+          <request>
+            <representation mediaType="*/*"/>
+          </request>
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+        <method name="PUT" id="updateEntity">
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+      </resource>
+      <resource path="{first: \$}links/{targetNavProp:.+?}{targetId: (\(.+?\))?}">
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="id"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="targetNavProp"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="targetId"/>
+        <method name="GET" id="getLinks">
+          <request>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+          </request>
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+        <method name="POST" id="createLink">
+          <request>
+            <representation mediaType="*/*"/>
+          </request>
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+        <method name="PUT" id="updateLink">
+          <request>
+            <representation mediaType="*/*"/>
+          </request>
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+        <method name="DELETE" id="deleteLink">
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+      </resource>
+      <resource path="{navProp: .+?}{optionalParens: ((\(\)))}">
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="id"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="navProp"/>
+        <method name="GET" id="getNavProperty">
+          <request>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$inlinecount"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$top"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skip"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$filter"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$orderby"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skiptoken"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+          </request>
+          <response>
+            <representation mediaType="application/atom+xml;charset=utf-8"/>
+            <representation mediaType="text/javascript;charset=utf-8"/>
+            <representation mediaType="application/json;charset=utf-8"/>
+          </response>
+        </method>
+        <method name="DELETE" id="deleteEntity">
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+        <method name="POST" id="mergeEntity">
+          <request>
+            <representation mediaType="*/*"/>
+          </request>
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+        <method name="PUT" id="updateEntity">
+          <response>
+            <representation mediaType="*/*"/>
+          </response>
+        </method>
+      </resource>
+    </resource>
+    <resource path="{entitySetName}">
+      <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+      <method name="GET" id="getEntities">
+        <request>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$inlinecount"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$top"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skip"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$filter"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$orderby"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skiptoken"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+        </request>
+        <response>
+          <representation mediaType="application/atom+xml;charset=utf-8"/>
+          <representation mediaType="text/javascript;charset=utf-8"/>
+          <representation mediaType="application/json;charset=utf-8"/>
+        </response>
+      </method>
+      <method name="POST" id="createEntity">
+        <request>
+          <representation mediaType="*/*"/>
+        </request>
+        <response>
+          <representation mediaType="application/atom+xml;charset=utf-8"/>
+          <representation mediaType="text/javascript;charset=utf-8"/>
+          <representation mediaType="application/json;charset=utf-8"/>
+        </response>
+      </method>
+      <method name="POST" id="processBatch">
+        <request>
+          <representation mediaType="multipart/mixed"/>
+        </request>
+        <response>
+          <representation mediaType="application/atom+xml;charset=utf-8"/>
+        </response>
+      </method>
+      <resource path="{count: [$]count}">
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="count"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+        <method name="GET" id="getEntitiesCount">
+          <request>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$inlinecount"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$top"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skip"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$filter"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$orderby"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skiptoken"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+          </request>
+          <response>
+            <representation mediaType="application/atom+xml;charset=utf-8"/>
+            <representation mediaType="text/javascript;charset=utf-8"/>
+            <representation mediaType="application/json;charset=utf-8"/>
+          </response>
+        </method>
+      </resource>
+      <resource path="{entitySetName}()">
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+        <method name="GET" id="getEntitiesParenthesis">
+          <request>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$inlinecount"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$top"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skip"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$filter"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$orderby"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skiptoken"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+          </request>
+          <response>
+            <representation mediaType="application/atom+xml;charset=utf-8"/>
+            <representation mediaType="text/javascript;charset=utf-8"/>
+            <representation mediaType="application/json;charset=utf-8"/>
+          </response>
+        </method>
+      </resource>
+    </resource>
+    <resource path="">
+      <method name="GET" id="getServiceDocument">
+        <request>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+        </request>
+        <response>
+          <representation mediaType="application/xml;charset=utf-8"/>
+          <representation mediaType="text/javascript;charset=utf-8"/>
+          <representation mediaType="application/json;charset=utf-8"/>
+        </response>
+      </method>
+    </resource>
+    <resource path="{first: \$}metadata">
+      <method name="GET" id="getMetadata">
+        <request>
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+        </request>
+        <response>
+          <representation mediaType="application/xml;charset=utf-8"/>
+          <representation mediaType="application/atomsvc+xml;charset=utf-8"/>
+        </response>
+      </method>
+      <resource path="{entitySetName}">
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="optionalId"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+        <method name="GET" id="getMetadataEntities">
+          <request>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$inlinecount"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$top"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skip"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$filter"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$orderby"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$skiptoken"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+          </request>
+          <response>
+            <representation mediaType="application/atom+xml;charset=utf-8"/>
+            <representation mediaType="text/javascript;charset=utf-8"/>
+            <representation mediaType="application/json;charset=utf-8"/>
+          </response>
+        </method>
+      </resource>
+      <resource path="{entitySetName}{id: (\(.+?\))}">
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="id"/>
+        <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="template" name="entitySetName"/>
+        <method name="GET" id="getMetadataEntity">
+          <request>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$format"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$callback"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$expand"/>
+            <param xmlns:xs="http://www.w3.org/2001/XMLSchema" type="xs:string" style="query" name="$select"/>
+          </request>
+          <response>
+            <representation mediaType="application/atom+xml;charset=utf-8"/>
+            <representation mediaType="text/javascript;charset=utf-8"/>
+            <representation mediaType="application/json;charset=utf-8"/>
+          </response>
+        </method>
+      </resource>
+    </resource>
+  </resources>
+</application>
+
+h2. Get Metadata in EDMX format
+
+bc.. 
+$ curl 'http://localhost:8887/OdataProduct.svc/$metadata/' | xmllint --format -
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" Version="1.0">
+  <edmx:DataServices m:DataServiceVersion="1.0">
+    <Schema xmlns="http://schemas.microsoft.com/ado/2006/04/edm" Namespace="OdataProduct">
+      <EntityType Name="Threads">
+        <Key>
+          <PropertyRef Name="Id"/>
+        </Key>
+        <Property Name="Name" Type="Edm.String" Nullable="true"/>
+        <Property Name="State" Type="Edm.String" Nullable="true"/>
+        <Property Name="Daemon" Type="Edm.Boolean" Nullable="true"/>
+        <Property Name="Id" Type="Edm.Int64" Nullable="false"/>
+        <Property Name="Alive" Type="Edm.Boolean" Nullable="true"/>
+        <Property Name="Interrupted" Type="Edm.Boolean" Nullable="true"/>
+        <Property Name="Priority" Type="Edm.Int32" Nullable="true"/>
+      </EntityType>
+      <EntityContainer Name="Container" m:IsDefaultEntityContainer="true">
+        <EntitySet Name="Threads" EntityType="OdataProduct.Threads"/>
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>
+
+h2. Get Metadata in application/atomsvc+xml format
+
+shorter, only lists collections aka entity sets. doesn't list properties.
+
+bc.. 
+$ curl -H 'Accept: application/atomsvc+xml' 'http://localhost:8887/OdataProduct.svc/$metadata' | xmllint --format -
+
+<?xml version="1.0" encoding="utf-8"?>
+<service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xml:base="http://localhost:8887/OdataProduct.svc/">
+  <workspace>
+    <atom:title>Default</atom:title>
+    <collection href="Threads">
+      <atom:title>Threads</atom:title>
+    </collection>
+  </workspace>
+</service>
