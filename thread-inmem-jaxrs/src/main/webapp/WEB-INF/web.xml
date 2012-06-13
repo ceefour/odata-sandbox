@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+	<servlet>
+		<servlet-name>ODataResteasy</servlet-name>
+		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+		<init-param>
+			<param-name>javax.ws.rs.Application</param-name>
+			<param-value>org.odata4j.producer.resources.DefaultODataApplication</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ODataResteasy</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+<!-- 	<servlet> -->
+<!-- 		<servlet-name>ODataJersey</servlet-name> -->
+<!-- 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class> -->
+<!-- 		<init-param> -->
+<!-- 			<param-name>javax.ws.rs.Application</param-name> -->
+<!-- 			<param-value>org.odata4j.producer.resources.DefaultODataApplication</param-value> -->
+<!-- 		</init-param> -->
+<!-- 		<load-on-startup>1</load-on-startup> -->
+<!-- 	</servlet> -->
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>ODataJersey</servlet-name> -->
+<!-- 		<url-pattern>/*</url-pattern> -->
+<!-- 	</servlet-mapping> -->
+
+	<!-- doesn't work with JBoss AS 7.1.1 due to multiple javax.ws.rs.core.Application classes -->
+	<!-- even replace RESTEasy with Jersey still doesn't work with: java.lang.UnsupportedOperationException: JBAS011859: Naming context 
+		is read-only -->
+	<!-- <servlet-mapping> -->
+	<!-- <servlet-name>org.odata4j.producer.resources.DefaultODataApplication</servlet-name> -->
+	<!-- <url-pattern>/*</url-pattern> -->
+	<!-- </servlet-mapping> -->
+</web-app>
